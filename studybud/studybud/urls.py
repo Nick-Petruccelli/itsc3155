@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
+import base.views as views
 
-def home(request) -> HttpResponse:
-    return HttpResponse('Home Page')
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home),
+    path('', views.home),
+    path('room/', views.room)
 ]
