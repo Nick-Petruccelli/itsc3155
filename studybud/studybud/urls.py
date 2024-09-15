@@ -4,6 +4,8 @@ from django.http import HttpResponse
 import base.views as views
 
 urlpatterns = [
+    path('login/', views.loginPage, name='login'),
+    path('logout/', views.logoutUser, name='logout'),
     path('admin/', admin.site.urls),
     path('', views.home),
     path('room/<int:pk>/', views.room, name='room'),
