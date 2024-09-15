@@ -6,6 +6,7 @@ import base.views as views
 urlpatterns = [
     path('login/', views.loginPage, name='login'),
     path('logout/', views.logoutUser, name='logout'),
+    path('register/', views.registerUser, name='register'),
     path('admin/', admin.site.urls),
     path('', views.home),
     path('room/<int:pk>/', views.room, name='room'),

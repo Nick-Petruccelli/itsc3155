@@ -24,8 +24,13 @@
         <div>
             <h3>{{room_count}} rooms found</h3>
             {% for room in rooms %}
+
                 <h2>{{room.id}} ---- <a href="/room/{{room.id}}">{{room.name}}</a></h2>
-                <small>host: {{room.host}} created: {{room.date_created}} <a href="/update-room/{{room.id}}">edit</a> <a href="/delete-room/{{room.id}}">delete</a></small>
+                <small>host: {{room.host}} created: {{room.date_created}} 
+                {% if request.user == room.host %}
+                    <a href="/update-room/{{room.id}}">edit</a> <a href="/delete-room/{{room.id}}">delete</a>
+                {% endif %}
+                </small>
                 <hr>
             {% endfor %}
         </div>
