@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import Room, Topic
+from .models import Room, Topic, Message
 from .forms import RoomForm
 
 
@@ -67,13 +67,26 @@ def registerUser(request):
     return render(request, "login_register.html", context)
 
 def room(request, pk) -> HttpResponse:
-    rooms = Room.objects.all()
-    room = None
-    for i in rooms:
-        if i.id == pk:
-            room = i
-    context = {'room': room}
+    room = Room.objects.get(id=pk)
+    msgs = room.message_set.all().order_by('-created')
+    participants = room.participants.all()
+    if request.method == 'POST':
+        print("hit post")
+        form = Message.objects.create(msg=request.POST.get('msg'), user=request.user, room=room)
+        form.save()
+        room.participants.add(request.user)
+        return redirect(f"/room/{pk}")
+    context = {'room': room, "msgs": msgs, "participants": participants}
     return render(request, "room.html", context=context)
+
+@login_required(login_url='/login')
+def delete_message(request, pk):
+    msg = Message.objects.get(id=pk)
+    if request.user == msg.user:
+        msg.delete()
+        return redirect(f"/room/{pk}")
+    else:
+        return HttpResponse('You dont belong here!!!!!!!')
 
 @login_required(login_url='/login')
 def create_room(request):
