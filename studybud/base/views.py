@@ -12,7 +12,7 @@ from .forms import RoomForm
 
 # Create your views here.
 def home(request) -> HttpResponse:
-    q = request.GET.get('q')
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
     if q:
         rooms = Room.objects.filter(
             Q(topic__name__icontains=q) |
@@ -23,7 +23,8 @@ def home(request) -> HttpResponse:
         rooms = Room.objects.all()
     room_count = rooms.count()
     topics = Topic.objects.all()
-    context = {"rooms":rooms, "topics":topics, "room_count":room_count}
+    room_messages = Message.objects.filter(Q(room__name__icontains=q))
+    context = {"rooms":rooms, "topics":topics, "room_count":room_count, "room_messages": room_messages}
     return render(request, "home.html", context)
 
 def loginPage(request):
@@ -82,9 +83,10 @@ def room(request, pk) -> HttpResponse:
 @login_required(login_url='/login')
 def delete_message(request, pk):
     msg = Message.objects.get(id=pk)
+    room_id = msg.room.id
     if request.user == msg.user:
         msg.delete()
-        return redirect(f"/room/{pk}")
+        return redirect(f"/room/{room_id}")
     else:
         return HttpResponse('You dont belong here!!!!!!!')
 
