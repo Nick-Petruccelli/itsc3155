@@ -80,6 +80,13 @@ def room(request, pk) -> HttpResponse:
     context = {'room': room, "msgs": msgs, "participants": participants}
     return render(request, "room.html", context=context)
 
+def user_profile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    room_messages = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {'user': user, 'rooms': rooms, 'room_messages': room_messages, 'topics': topics}
+    return render(request, 'profile.html', context)
 @login_required(login_url='/login')
 def delete_message(request, pk):
     msg = Message.objects.get(id=pk)
