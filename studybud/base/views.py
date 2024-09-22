@@ -57,13 +57,13 @@ def registerUser(request):
         return redirect("/")
     form = UserCreationForm()
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect("/")
-        else:
-            messages.error(request, "an error occurred creating your account")
+        form = request.POST
+        user = User.objects.create(
+            username=form.get('username'),
+            password=form.get('password')
+            )
+        login(request, user)
+        return redirect("/")
     context = {"form":form}
     return render(request, "login_register.html", context)
 
@@ -99,13 +99,19 @@ def delete_message(request, pk):
 
 @login_required(login_url='/login')
 def create_room(request):
-    form = RoomForm()
+    topics = Topic.objects.all()
     if request.method == 'POST':
-        form = RoomForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("/")
-    context = {'form': form}
+        form = request.POST
+        if not Topic.objects.filter(name=form.get('topic')).exists():
+            Topic.objects.create(name=form.get('topic'))
+        Room.objects.create(
+            host=request.user,
+            name=form.get('room_name'),
+            topic=Topic.objects.get(name=form.get('topic')),
+            desc=form.get('room_about')
+        )
+        redirect('/')
+    context = {'topics':topics}
     return render(request, "create_room.html", context)
 
 @login_required(login_url='/login')
@@ -132,5 +138,5 @@ def delete_room(request, pk):
     if request.method == 'POST':
         room.delete()
         return redirect('/')
-    context = {'obj': 'room'}
+    context = {'obj': room}
     return render(request, "delete.html", context)
