@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse
 import base.views as views
 
@@ -18,5 +18,6 @@ urlpatterns = [
     path('update_user/', views.update_user, name='update_user'),
     path('topics/', views.topics_page, name='topics'),
     path('activity/', views.activity_page, name='activity'),
-
+    path('api/', include('base.api.urls')),
+    path('api-auth/', include('rest_framework.urls'))
 ]
