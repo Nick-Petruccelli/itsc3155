@@ -22,7 +22,7 @@ def home(request) -> HttpResponse:
     else:
         rooms = Room.objects.all()
     room_count = rooms.count()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all()[0:5]
     room_messages = Message.objects.filter(Q(room__name__icontains=q))
     context = {"rooms":rooms, "topics":topics, "room_count":room_count, "room_messages": room_messages}
     return render(request, "home.html", context)
@@ -152,3 +152,17 @@ def update_user(request):
         return redirect('user-profile', pk=user.id)
     context = {'form': form}
     return render(request, "update_user.html",context)
+
+def topics_page(request):
+    q = request.GET.get('q') if request.GET.get('q') != None else ''
+    topics = Topic.objects.filter(Q(name__icontains=q))
+    room_count = 0
+    for topic in topics:
+        room_count += topic.room_set.count()
+    context = {"topics":topics, "room_count":room_count}
+    return render(request, 'topics.html', context)
+
+def activity_page(request):
+    messages = Message.objects.all()[0:5]
+    context = {'messages':messages}
+    return render(request, "activity.html", context)
